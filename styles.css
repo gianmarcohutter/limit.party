@@ -13,25 +13,38 @@ body {
     background-position: 0 0;
     background-attachment: fixed;
     transition: background-position 0.3s ease;
+    color: white; /* Make all text white by default */
 }
 
 .content-wrapper {
     position: fixed;
-    top: 50%;
+    top: 10%; /* Move content up */
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     text-align: center;
-    width: 100%;
+    width: 80%; /* Limit width for better readability */
+    max-width: 600px; /* Maximum width */
 }
 
 h1 {
-    color: #ffffff;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-p {
-    color: #ffffff;
+p, ul {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.content-wrapper > p:first-of-type,
+ul {
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+}
+
+ul {
+    padding-left: 20px; /* Add some padding for the bullet points */
+    list-style-position: outside; /* Keep bullets outside */
 }
 
 #total-value {
@@ -40,12 +53,11 @@ p {
     border-radius: 10px;
     display: inline-block;
     font-weight: bold;
-    color: #ffffff;
 }
 
 #mario {
     position: fixed;
-    bottom: 110px;
+    bottom: var(--mario-bottom-position, 20%); /* Default to 20% if JS doesn't run */
     left: 50%;
     transform: translateX(-50%);
     width: 100px; /* Adjust based on your Mario image size */
@@ -57,6 +69,20 @@ p {
 }
 
 @keyframes jump {
-    0%, 100% { bottom: 110px; }
-    50% { bottom: 200px; } /* Adjust this value to change jump height */
+    0%, 100% { bottom: var(--mario-bottom-position, 20%); }
+    50% { bottom: calc(var(--mario-bottom-position, 20%) + 160px); } /* Doubled from 80px to 160px */
+}
+
+#touch-controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    display: flex;
+}
+
+#left-control, #right-control {
+    flex: 1;
+    height: 100%;
 }

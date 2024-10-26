@@ -8,13 +8,23 @@
 </head>
 <body>
     <div class="content-wrapper">
-        <h1>Welcome to Limit Party</h1>
-        <p>This is a free landing page hosted on GitHub Pages.</p>
-        <p id="total-value">Loading Tesla Stock Price...</p>
+        <h1>Alles guete zum nicht Geburtstag!</h1>
+        <p>Bedingige für de limit-party-fund:</p>
+        <ul>
+            <li>Ihlösbar ab 2040</li>
+            <li>De lieblingsunclegötti Gian muess au ihglade sii</li>
+            <li>Nur z verwende für limit sache (optional au dangeeros)</li>
+        </ul>
+        <p id="total-value">Rösl am sueche...</p>
     </div>
     
     <img id="mario" src="images/mario_front.png" alt="Mario">
     
+    <div id="touch-controls">
+        <div id="left-control"></div>
+        <div id="right-control"></div>
+    </div>
+
     <script>
         (function() {
             console.log('Loading main.js 2');
@@ -25,12 +35,29 @@
     </script>
 
     <script>
+        const MARIO_BOTTOM_POSITION = 13; // Percentage from bottom of screen
+
+        // Set CSS variable
+        document.documentElement.style.setProperty('--mario-bottom-position', MARIO_BOTTOM_POSITION + '%');
+
         let backgroundPosition = 0;
-        const scrollSpeed = 10; // Adjust this value to change scroll speed
+        const scrollSpeed = 5; // Adjust this value to change scroll speed
         const mario = document.getElementById('mario');
         let isFacingLeft = false;
         let isWalking = false;
         let walkFrame = 0;
+        let walkInterval;
+        let moveInterval;
+        let currentDirection = null;
+
+        // Set Mario's initial position
+        function setMarioPosition() {
+            mario.style.bottom = `${MARIO_BOTTOM_POSITION}%`;
+        }
+
+        // Call this function on load and window resize
+        setMarioPosition();
+        window.addEventListener('resize', setMarioPosition);
 
         function startWalking() {
             if (!isWalking) {
@@ -41,41 +68,106 @@
 
         function stopWalking() {
             isWalking = false;
+            clearInterval(walkInterval);
             mario.src = 'images/mario_front.png';
         }
 
         function walkAnimation() {
-            if (isWalking) {
+            walkInterval = setInterval(() => {
                 walkFrame = (walkFrame + 1) % 2;
                 mario.src = walkFrame === 0 ? 'images/mario_front.png' : 'images/mario_jump.png';
-                setTimeout(walkAnimation, 150); // Adjust this value to change animation speed
+            }, 150); // Adjust this value to change animation speed
+        }
+
+        function moveBackground() {
+            if (currentDirection === 'left') {
+                backgroundPosition += scrollSpeed;
+            } else if (currentDirection === 'right') {
+                backgroundPosition -= scrollSpeed;
             }
+            updateBackground();
+        }
+
+        function startMoving(direction) {
+            if (currentDirection !== direction) {
+                currentDirection = direction;
+                clearInterval(moveInterval);
+                moveInterval = setInterval(moveBackground, 30); // Adjust for smoother or faster movement
+            }
+            mario.style.transform = `translateX(-50%) scaleX(${direction === 'left' ? -1 : 1})`;
+            isFacingLeft = (direction === 'left');
+            startWalking();
+        }
+
+        function stopMoving() {
+            currentDirection = null;
+            clearInterval(moveInterval);
+            stopWalking();
+        }
+
+        function updateBackground() {
+            document.body.style.backgroundPosition = `${backgroundPosition}px 0`;
+        }
+
+        function handleInput(input) {
+            if (input === 'left') {
+                startMoving('left');
+            } else if (input === 'right') {
+                startMoving('right');
+            } else if (input === 'up') {
+                jump();
+            }
+        }
+
+        function handleInputEnd() {
+            stopMoving();
         }
 
         document.addEventListener('keydown', function(event) {
             if (event.key === 'ArrowLeft') {
                 event.preventDefault();
-                backgroundPosition += scrollSpeed;
-                mario.style.transform = 'translateX(-50%) scaleX(-1)'; // Face right
-                isFacingLeft = true;
-                startWalking();
+                handleInput('left');
             } else if (event.key === 'ArrowRight') {
                 event.preventDefault();
-                backgroundPosition -= scrollSpeed;
-                mario.style.transform = 'translateX(-50%) scaleX(1)'; // Face left
-                isFacingLeft = false;
-                startWalking();
+                handleInput('right');
             } else if (event.key === 'ArrowUp') {
                 event.preventDefault();
-                jump();
+                handleInput('up');
             }
-            document.body.style.backgroundPosition = `${backgroundPosition}px 0`;
         });
 
         document.addEventListener('keyup', function(event) {
             if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-                stopWalking();
+                handleInputEnd();
             }
+        });
+
+        // Touch controls
+        let touchStartX;
+
+        document.addEventListener('touchstart', function(event) {
+            event.preventDefault();
+            touchStartX = event.touches[0].clientX;
+            const screenWidth = window.innerWidth;
+            
+            if (touchStartX < screenWidth / 3) {
+                handleInput('left');
+            } else if (touchStartX > (screenWidth * 2) / 3) {
+                handleInput('right');
+            } else {
+                handleInput('up');
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', function(event) {
+            event.preventDefault();
+            handleInputEnd();
+        }, { passive: false });
+
+        // Make Mario jump when tapped
+        mario.addEventListener('touchstart', function(event) {
+            event.preventDefault();
+            jump();
         });
 
         function jump() {
