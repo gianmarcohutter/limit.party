@@ -2,14 +2,18 @@
   "name": "limit.party",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.6.3"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "live-server",
+    "watch-ts": "tsc -w",
+    "dev": "npm-run-all --parallel start watch-ts"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "typescript": "^5.5.4"
-  }
+  "license": "ISC"
 }

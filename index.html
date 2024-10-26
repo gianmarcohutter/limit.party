@@ -7,8 +7,94 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Welcome to Limit Party</h1>
-    <p>This is a free landing page hosted on GitHub Pages.</p>
-    <script src="main.js"></script>
+    <div class="content-wrapper">
+        <h1>Welcome to Limit Party</h1>
+        <p>This is a free landing page hosted on GitHub Pages.</p>
+        <p id="total-value">Loading Tesla Stock Price...</p>
+    </div>
+    
+    <img id="mario" src="images/mario_front.png" alt="Mario">
+    
+    <script>
+        (function() {
+            console.log('Loading main.js 2');
+            var script = document.createElement('script');
+            script.src = 'main.js';
+            document.head.appendChild(script);
+        })();
+    </script>
+
+    <script>
+        let backgroundPosition = 0;
+        const scrollSpeed = 10; // Adjust this value to change scroll speed
+        const mario = document.getElementById('mario');
+        let isFacingLeft = false;
+        let isWalking = false;
+        let walkFrame = 0;
+
+        function startWalking() {
+            if (!isWalking) {
+                isWalking = true;
+                walkAnimation();
+            }
+        }
+
+        function stopWalking() {
+            isWalking = false;
+            mario.src = 'images/mario_front.png';
+        }
+
+        function walkAnimation() {
+            if (isWalking) {
+                walkFrame = (walkFrame + 1) % 2;
+                mario.src = walkFrame === 0 ? 'images/mario_front.png' : 'images/mario_jump.png';
+                setTimeout(walkAnimation, 150); // Adjust this value to change animation speed
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                backgroundPosition += scrollSpeed;
+                mario.style.transform = 'translateX(-50%) scaleX(-1)'; // Face right
+                isFacingLeft = true;
+                startWalking();
+            } else if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                backgroundPosition -= scrollSpeed;
+                mario.style.transform = 'translateX(-50%) scaleX(1)'; // Face left
+                isFacingLeft = false;
+                startWalking();
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                jump();
+            }
+            document.body.style.backgroundPosition = `${backgroundPosition}px 0`;
+        });
+
+        document.addEventListener('keyup', function(event) {
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                stopWalking();
+            }
+        });
+
+        function jump() {
+            if (!mario.classList.contains('jumping')) {
+                mario.classList.add('jumping');
+                const originalSrc = mario.src;
+                mario.src = 'images/mario_jump.png';
+
+                // Apply the correct direction to the jumping Mario
+                mario.style.transform = `translateX(-50%) scaleX(${isFacingLeft ? -1 : 1})`;
+                
+                setTimeout(() => {
+                    mario.classList.remove('jumping');
+                    mario.src = originalSrc;
+                    // Reapply the correct direction after jumping
+                    mario.style.transform = `translateX(-50%) scaleX(${isFacingLeft ? -1 : 1})`;
+                }, 500); // This should match the animation duration in CSS
+            }
+        }
+    </script>
 </body>
 </html>
